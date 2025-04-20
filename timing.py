@@ -9,7 +9,6 @@ import webbrowser
 from _func import *
 import sys
 
-# --- Main App Window ---
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -30,8 +29,8 @@ class App(tk.Tk):
         page.tkraise()
     def on_closing(self):
         print("Closing app...")
-        self.destroy()  # Destroys the window
-        sys.exit()      # Fully exits the program
+        self.destroy()  
+        sys.exit()      
 
 class PageTwo(tk.Frame):
     def __init__(self, master):
@@ -53,7 +52,7 @@ class PageTwo(tk.Frame):
 
         self.bottom_label2 = ttk.Label(self,font=("Arial", 14), foreground="black", text="""Other note:\n\t
         1-Exact analysis are shown on bottom of the page for three different priority order.\n\t
-        2-Exact analysis will not consider Aperiodic tasks.\n\t
+        2-Exact analysis will consider Aperiodic tasks as normal periodic task (period is aperiodic server period and lenght is budget).\n\t
         5-Aperiodic Server color is red. """, justify="left")
         self.bottom_label2.grid( column=0,  padx=(0, 0), sticky="ew")
 
@@ -110,7 +109,6 @@ class PageThree(tk.Frame):
         self.task_name_input = ttk.Entry(form)
         self.task_name_input.grid(row=0, column=1)
 
-        # Number Inputs
         self.num_inputs = []
         for i, label in enumerate(["Period:", "Job length:", "Deadline:"]):
             ttk.Label(form, text=label).grid(row=i+1, column=0, sticky="w")
@@ -128,11 +126,14 @@ class PageThree(tk.Frame):
         for i, val in enumerate([ "EDF", "P-Fair"]):
             r = ttk.Radiobutton(form, text=val, variable=self.scheduling_type_input, value=val)
             r.grid(row=7+i, column=0, columnspan=2, sticky="w")
-
-        ttk.Button(form, text="Submit", command=self.submit_data).grid(row=9, column=0, pady=5)
-        ttk.Button(form, text="Help", command=lambda: master.show_page(PageTwo)).grid(row=9, column=1, pady=5)
-        ttk.Button(form, text="Single Processor", command=lambda: master.show_page(PageOne)).grid(row=10, column=1, pady=5)
-        ttk.Button(form, text="Delete Selected Row", command=self.delete_selected_task).grid(row=10, column=0, columnspan=1, pady=5)
+        ttk.Label(form, text="Simulation Lenght:").grid(row=9, column=0, sticky="w")
+        self.simulation_time = ttk.Entry(form)
+        self.simulation_time.grid(row=9, column=1)
+        self.simulation_time.insert(0,str(simulationTime))
+        ttk.Button(form, text="Submit", command=self.submit_data).grid(row=10, column=0, pady=5)
+        ttk.Button(form, text="Help", command=lambda: master.show_page(PageTwo)).grid(row=10, column=1, pady=5)
+        ttk.Button(form, text="Single Processor", command=lambda: master.show_page(PageOne)).grid(row=11, column=1, pady=5)
+        ttk.Button(form, text="Delete Selected Row", command=self.delete_selected_task).grid(row=11, column=0, columnspan=1, pady=5)
 
         self.bottom_label = ttk.Label(form,font=("Arial", 13), foreground="blue", text="Utilization: N", justify="left")
         self.bottom_label.grid()
@@ -150,10 +151,11 @@ class PageThree(tk.Frame):
                 return
         try:
             numberOfProcessor = int(self.processor_count_input.get())
+            simulationTime = int(self.simulation_time.get())
         except ValueError:
             messagebox.showerror("Input Error", "Please enter valid numbers.")
             return
-        print(numberOfProcessor)
+        
         self.examples =[multiTasksPeriod,multiTasksJob,multiTasksDeadline]
         T, C, D = self.examples[0], self.examples[1], self.examples[2]
 
@@ -170,13 +172,11 @@ class PageThree(tk.Frame):
 
         self.title = "Schedule Plot"
 
-        print(self.results)
         self.plot_schedule(self.examples,self.results,self.title, numberOfProcessor)
         self.task_name_input.delete(0, tk.END)
         for n in self.num_inputs:
             n.delete(0, tk.END)
     def plot_schedule(self, examples, results, title,numberOfProcessor):
-        print(results)
         self.ax.clear()
         T, C, D = examples[0], examples[1], examples[2]
         tasks = np.array(results)
@@ -253,7 +253,6 @@ class PageOne(tk.Frame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=3)
 
-        # === Right side: Plot ===
         self.fig, self.ax = plt.subplots(figsize=(12, 8))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.get_tk_widget().grid(row=0, column=1, rowspan=2, padx=(0,0), pady=(0,0), sticky="nsew")
@@ -277,7 +276,6 @@ class PageOne(tk.Frame):
             self.task_table.column(col, width=50)
         self.task_table.pack(fill="both", expand=True)
 
-        # Form Frame (below table)
         form = ttk.Frame(self)
         form.grid(row=1, column=0, sticky="n", padx=(30,0), pady=(5, 10))
 
@@ -286,7 +284,6 @@ class PageOne(tk.Frame):
         self.task_name_input = ttk.Entry(form)
         self.task_name_input.grid(row=0, column=1)
 
-        # Number Inputs
         self.num_inputs = []
         for i, label in enumerate(["Period:", "Job length:", "Deadline:"]):
             ttk.Label(form, text=label).grid(row=i+1, column=0, sticky="w")
@@ -340,7 +337,6 @@ class PageOne(tk.Frame):
             r = ttk.Radiobutton(form, text=val, variable=self.aperiodic_server_type, value=val)
             r.grid(row=12+i, column=0, columnspan=2, sticky="w")
 
-        # Radio buttons
         self.scheduling_type_input = tk.StringVar(value="RMS")
         ttk.Label(form, text="Algorithm:").grid(row=14, column=0, sticky="w")
         for i, val in enumerate(["RMS", "DM", "EDF"]):
@@ -352,7 +348,6 @@ class PageOne(tk.Frame):
         self.simulation_time.grid(row=18, column=1)
         self.simulation_time.insert(0,str(simulationTime))
 
-        # Buttons
         ttk.Button(form, text="Submit", command=self.submit_data).grid(row=19, column=0, pady=5)
         ttk.Button(form, text="Help", command=lambda: master.show_page(PageTwo)).grid(row=19, column=1, pady=5)
         ttk.Button(form, text="Multi Processor", command=lambda: master.show_page(PageThree)).grid(row=20, column=1, pady=5)
@@ -365,18 +360,16 @@ class PageOne(tk.Frame):
         self.bottom_label2.grid( column=0, columnspan=3, padx=(0, 0), sticky="ew")  
 
     def calculateExact(self):
-        print(self.examples)
         T, C, D = self.examples[0], self.examples[1], self.examples[2]
 
         if(self.have_aperiodic.get()):
             T = np.append(T,np.array(int(self.aperiodic_period.get())))
             C = np.append(C,np.array(int(self.aperiodic_budget.get())))
-            D = np.append(T,np.array(int(self.aperiodic_period.get())))
+            D = np.append(D,np.array(int(self.aperiodic_period.get())))
             tasksName2 = list(tasksName)
             tasksName2.append('Server')
         else:
             tasksName2 = list(tasksName)
-        print(C)
         utilization = 0
         for i in range(len(T)):
             utilization += C[i]/T[i]
@@ -555,7 +548,6 @@ class PageOne(tk.Frame):
 
 
     def submit_data(self, justPlot = False):
-        print("fdfd")
         if not justPlot and self.task_name_input.get() != "":
             try:
                 numbers = [float(n.get()) for n in self.num_inputs]
@@ -586,9 +578,6 @@ class PageOne(tk.Frame):
             return
         
         self.examples =[tasksPeriod,tasksJob,tasksDeadline]
-        print(self.examples)
-        print(self.scheduling_type_input.get())
-        print(self.have_aperiodic.get())
 
         if(self.scheduling_type_input.get() == 'RMS'):
             self.showDeadline = False
@@ -614,7 +603,6 @@ class PageOne(tk.Frame):
             else:
                 self.results = dm_scheduler(self.examples,simulationTime)
                 self.haveIntrupt = False
-        print("dsdsdasddf sdfsd fsd fsd")
         self.update_plot()
         self.calculateExact()
 

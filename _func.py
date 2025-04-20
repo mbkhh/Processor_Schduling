@@ -87,7 +87,6 @@ def multiProcessor_pfair(examples,numberOfProcessor=1, time_limit = 40):
 def rm_scheduler_aperiodic(examples,Aperiod=0,Budget=0,aperiodicArrivals=[],aperiodicLenght=[],serverType='Dumb', time_limit = 40):
     T, C = np.array(examples[0]), np.array(examples[1])
     T2 = np.append(T,np.array(Aperiod))
-    print(T2)
     sortedT = np.argsort(T2)
     timeline = np.zeros((T.size ,  time_limit),dtype=int)
     aperiodicTimeline = np.zeros(  time_limit,dtype=int)
@@ -112,7 +111,6 @@ def rm_scheduler_aperiodic(examples,Aperiod=0,Budget=0,aperiodicArrivals=[],aper
             
         for i in range(T2.size):
             aperiodicBudgetTimeline[t] = remainingBudget 
-            print(aperiodicRemaining)
             if(sortedT[i] == len(T)): #aperioodic
                 if(aperiodicRemaining > 0 and remainingBudget > 0):
                     aperiodicRemaining -= 1
@@ -178,7 +176,7 @@ def rm_scheduler(examples, time_limit = 40):
 def dm_scheduler_aperiodic(examples,Aperiod=0,Budget=0,aperiodicArrivals=[],aperiodicLenght=[],serverType='Dumb', time_limit = 40):
     T, C, D = np.array(examples[0]), np.array(examples[1]), np.array(examples[2])
     T2 = np.append(D,np.array(Aperiod))
-    print(T2)
+
     sortedT = np.argsort(T2)
     timeline = np.zeros((T.size ,  time_limit),dtype=int)
     aperiodicTimeline = np.zeros(  time_limit,dtype=int)
@@ -203,7 +201,6 @@ def dm_scheduler_aperiodic(examples,Aperiod=0,Budget=0,aperiodicArrivals=[],aper
             
         for i in range(T2.size):
             aperiodicBudgetTimeline[t] = remainingBudget 
-            print(aperiodicRemaining)
             if(sortedT[i] == len(T)): #aperioodic
                 if(aperiodicRemaining > 0 and remainingBudget > 0):
                     aperiodicRemaining -= 1
