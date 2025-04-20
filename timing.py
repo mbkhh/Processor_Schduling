@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.patches import Patch
+import webbrowser
 from _func import *
 import sys
 
@@ -56,9 +57,14 @@ class PageTwo(tk.Frame):
         5-Aperiodic Server color is red. """, justify="left")
         self.bottom_label2.grid( column=0,  padx=(0, 0), sticky="ew")
 
-        self.bottom_label3 = ttk.Label(self,font=("Arial", 14), foreground="blue", text="Project BY Mohammad Bagher Khandan \n ", justify="left")
+        self.bottom_label3 = ttk.Label(self,font=("Arial", 15), foreground="black", text="Project BY Mohammad Bagher Khandan ", justify="left")
         self.bottom_label3.grid( column=0,  padx=(0, 0), sticky="ew")
 
+        self.link = tk.Label(self, text="GitHub Repository of Project", fg="blue", cursor="hand2", font=("Arial", 13, "underline"))
+        self.link.grid( column=0,  padx=(0, 0), sticky="ew")
+        self.link.bind("<Button-1>", self.open_link)
+    def open_link(self,event):
+        webbrowser.open_new("https://github.com/mbkhh/Processor_Schduling")
     def load_data(self):
         for i, row in enumerate(self.data):
             self.tree.insert("", "end", iid=i, values=row)
@@ -370,6 +376,7 @@ class PageOne(tk.Frame):
             tasksName2.append('Server')
         else:
             tasksName2 = list(tasksName)
+        print(C)
         utilization = 0
         for i in range(len(T)):
             utilization += C[i]/T[i]
@@ -478,6 +485,8 @@ class PageOne(tk.Frame):
             index = int(selected_item2[0][1:])
             del aperiodicArrival[index-1]
             del aperiodicLenght[index-1]
+
+            self.aperiodic_table.delete(selected_item2)
         if not selected_item and not selected_item2:
             messagebox.showwarning("No selection", "Please select a task to delete.")
         else:
@@ -546,6 +555,7 @@ class PageOne(tk.Frame):
 
 
     def submit_data(self, justPlot = False):
+        print("fdfd")
         if not justPlot and self.task_name_input.get() != "":
             try:
                 numbers = [float(n.get()) for n in self.num_inputs]
@@ -567,13 +577,6 @@ class PageOne(tk.Frame):
             except ValueError:
                 messagebox.showerror("Input Error", "Please enter valid numbers.")
                 return
-        if not justPlot and self.aperiodic_task_arrival.get() != "":
-            try:
-                arrival = float(self.aperiodic_task_arrival.get())
-                lenght = float(self.aperiodic_task_lenght.get())
-            except ValueError:
-                messagebox.showerror("Input Error", "Please enter valid numbers.")
-            return
         try:
             aperiodicPeriod = int(self.aperiodic_period.get())
             aperiodicbudget = int(self.aperiodic_budget.get())
@@ -611,7 +614,7 @@ class PageOne(tk.Frame):
             else:
                 self.results = dm_scheduler(self.examples,simulationTime)
                 self.haveIntrupt = False
-        
+        print("dsdsdasddf sdfsd fsd fsd")
         self.update_plot()
         self.calculateExact()
 
